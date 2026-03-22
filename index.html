@@ -3,162 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>فلاحي الذكي 🌱 | Smart Farmer AI</title>
-    
-    <script type="importmap">
-      {
-        "imports": {
-          "@google/generative-ai": "https://esm.run/@google/generative-ai"
-        }
-      }
-    </script>
-
+    <title>فلاحي الذكي 🌱</title>
     <style>
         :root {
-            --primary-bg: radial-gradient(circle at top right, #3e0a3e, #1f0131, #0d3b1e);
-            --glass: rgba(255, 255, 255, 0.08);
-            --border: rgba(255, 255, 255, 0.15);
-            --accent: #a5ffa5;
+            --purple: #3e0a3e;
+            --green: #28a745;
+            --glass: rgba(255, 255, 255, 0.1);
         }
 
-        body {
-            margin: 0; padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--primary-bg);
-            height: 100vh; display: flex; justify-content: center; align-items: center;
-            color: white; overflow: hidden;
+        body { 
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: radial-gradient(circle at top right, #1f0131, #0d3b1e); 
+            color: white; height: 100vh; display: flex; justify-content: center; align-items: center;
         }
 
-        .app-card {
-            width: 90%; max-width: 420px;
-            background: var(--glass);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-radius: 30px; border: 1px solid var(--border);
-            padding: 25px; box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-            display: flex; flex-direction: column; gap: 20px;
+        .app-container {
+            width: 90%; max-width: 400px; height: 80vh;
+            background: var(--glass); backdrop-filter: blur(20px);
+            border-radius: 30px; border: 1px solid rgba(255,255,255,0.2);
+            padding: 25px; display: flex; flex-direction: column; position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        header h1 { font-size: 1.6rem; margin: 0; color: #dcbfff; text-align: center; }
-        header p { font-size: 0.85rem; opacity: 0.8; text-align: center; margin: 5px 0 0; }
+        .page { display: none; flex-direction: column; height: 100%; animation: fadeIn 0.5s ease; }
+        .active { display: flex; }
 
-        .cam-box {
-            position: relative; width: 100%; aspect-ratio: 1;
-            border-radius: 20px; overflow: hidden;
-            background: #000; border: 1px solid var(--border);
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* الصفحة 1: الترحيب */
+        .welcome-screen { justify-content: center; align-items: center; text-align: center; }
+        .logo { font-size: 80px; margin-bottom: 20px; }
+        .welcome-title { font-size: 2rem; margin: 0; color: #dcbfff; }
+        .welcome-desc { font-size: 1rem; opacity: 0.8; margin: 15px 0 30px; }
+
+        /* الصفحة 2: الكاميرا */
+        .camera-screen { gap: 15px; }
+        .viewfinder { width: 100%; aspect-ratio: 1; border-radius: 20px; background: #000; overflow: hidden; position: relative; }
+        video, img#preview { width: 100%; height: 100%; object-fit: cover; }
+        .hidden-input { display: none; }
+
+        /* الصفحة 3: النتائج */
+        .result-screen { text-align: right; }
+        .result-box { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 20px; border: 1px solid var(--green); margin-top: 10px; overflow-y: auto; }
+        .result-item { margin-bottom: 15px; }
+        .result-label { font-weight: bold; color: var(--green); display: block; margin-bottom: 5px; }
+
+        /* الأزرار */
+        .btn { 
+            background: var(--green); border: none; padding: 16px; border-radius: 15px; 
+            color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s;
+            margin-top: 10px; text-decoration: none; text-align: center;
         }
-
-        video { width: 100%; height: 100%; object-fit: cover; }
-
-        .scan-line {
-            position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-            background: var(--accent); box-shadow: 0 0 15px var(--accent);
-            animation: scan 2.5s ease-in-out infinite; display: none;
-        }
-
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-
-        .btn-main {
-            background: linear-gradient(45deg, #228b22, #32cd32);
-            border: none; padding: 16px; border-radius: 18px;
-            color: white; font-size: 1.1rem; font-weight: bold;
-            cursor: pointer; transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(34,139,34,0.3);
-        }
-
-        .btn-main:disabled { background: #555; cursor: wait; }
-
-        #result {
-            background: rgba(0,0,0,0.5); border-radius: 18px;
-            padding: 15px; font-size: 0.95rem; line-height: 1.6;
-            display: none; max-height: 180px; overflow-y: auto;
-            text-align: right; border: 1px solid rgba(255,255,255,0.1);
-        }
+        .btn-outline { background: transparent; border: 2px solid white; margin-top: 5px; }
+        .btn:active { transform: scale(0.95); }
+        .btn:disabled { background: #555; cursor: wait; }
     </style>
 </head>
 <body>
 
-    <div class="app-card">
-        <header>
-            <h1>فلاحي الذكي 🌱</h1>
-            <p>مشروع "فكرة صح" - El Milia</p>
-        </header>
+    <div class="app-container">
         
-        <div class="cam-box">
-            <video id="video" autoplay playsinline></video>
-            <div id="scanner" class="scan-line"></div>
+        <div id="page1" class="page active welcome-screen">
+            <div class="logo">🌱</div>
+            <h1 class="welcome-title">فلاحي الذكي</h1>
+            <p class="welcome-desc">مشروع "فكرة صح" - El Milia<br>شريكك في حماية أشجارك</p>
+            <button class="btn" onclick="showPage(2)">ابدأ الآن</button>
         </div>
 
-        <button id="analyzeBtn" class="btn-main">حلل الحالة الآن</button>
-        
-        <div id="result"></div>
+        <div id="page2" class="page camera-screen">
+            <h3>التقط أو ارفع صورة</h3>
+            <div class="viewfinder" id="viewfinder">
+                <video id="v" autoplay playsinline></video>
+                <img id="preview" style="display:none;">
+            </div>
+            
+            <input type="file" id="fileInput" class="hidden-input" accept="image/*">
+            <button class="btn btn-outline" onclick="document.getElementById('fileInput').click()">📁 رفع صورة من الهاتف</button>
+            <button class="btn" id="analyzeBtn">🔍 تحليل الحالة</button>
+        </div>
+
+        <div id="page3" class="page result-screen">
+            <h3>التشخيص الذكي ✅</h3>
+            <div class="result-box" id="resultContent">
+                <div class="result-item">
+                    <span class="result-label">المرض:</span>
+                    <span id="res-disease">جاري الاستخراج...</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">السبب:</span>
+                    <span id="res-cause">...</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">العلاج المقترح:</span>
+                    <span id="res-treatment">...</span>
+                </div>
+            </div>
+            <button class="btn btn-outline" onclick="location.reload()">🔄 فحص نبتة أخرى</button>
+        </div>
+
     </div>
 
     <script type="module">
-        import { GoogleGenerativeAI } from "@google/generative-ai";
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-        // نستخدم نفس مفتاحك القديم، التغيير سيكون في اسم النموذج
-        const API_KEY = "AIzaSyCsjD0q6RaOgEe9jVMLCiwPrPUb9IZbZV4"; 
-        const genAI = new GoogleGenerativeAI(API_KEY);
-        
-        // التعديل الجذري هنا: نستخدم النموذج المستقر gemini-pro-vision المخصص للصور
-        const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+        const genAI = new GoogleGenerativeAI("AIzaSyC4GEBtdzNq_LQ5-WzFJ_SgdKB-xg8lr-Y");
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const video = document.getElementById('video');
-        const btn = document.getElementById('analyzeBtn');
-        const resultDiv = document.getElementById('result');
-        const scanner = document.getElementById('scanner');
+        window.showPage = (pageNum) => {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page' + pageNum).classList.add('active');
+            if(pageNum === 2) startCamera();
+        };
 
-        async function startCam() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "environment" } 
-                });
-                video.srcObject = stream;
-            } catch (err) {
-                resultDiv.style.display = "block";
-                resultDiv.innerHTML = "يرجى تفعيل الكاميرا (يجب أن يكون الرابط HTTPS).";
-            }
+        const v = document.getElementById('v');
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(s => v.srcObject = s).catch(e => console.log("Camera error"));
         }
 
-        function getFrame() {
+        // معالجة رفع الملف
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                v.style.display = 'none';
+                preview.src = event.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        };
+
+        analyzeBtn.onclick = async () => {
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerText = "جاري التحليل... ⏳";
+
             const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            // نحول الصورة إلى Base64، نموذج gemini-pro-vision يحتاجها بهذه الصيغة
-            return canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
-        }
-
-        btn.onclick = async () => {
-            btn.disabled = true; btn.innerText = "جاري التحليل... ⏳";
-            scanner.style.display = "block"; resultDiv.style.display = "block";
-            resultDiv.innerHTML = "يتم الآن التواصل مع الذكاء الاصطناعي (Stable API)...";
+            canvas.width = v.videoWidth || preview.naturalWidth;
+            canvas.height = v.videoHeight || preview.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(v.style.display !== 'none' ? v : preview, 0, 0, canvas.width, canvas.height);
+            const imgBase64 = canvas.toDataURL('image/jpeg', 0.5).split(',')[1];
 
             try {
-                const imageData = getFrame();
-                const prompt = "أنت خبير فلاحي جزائري. حلل النبتة في الصورة. إذا لم تكن نباتاً، رد بـ NOT_A_PLANT. إذا كانت نباتاً، شخص الحالة وأعطِ العلاج باللهجة الجزائرية باختصار.";
-                
-                // تغيير طريقة الإرسال لتتوافق مع نموذج gemini-pro-vision
-                const result = await model.generateContent([
-                    prompt,
-                    { inlineData: { data: imageData, mimeType: "image/jpeg" } }
-                ]);
-
+                const prompt = "حلل صورة النبتة. إذا لم تكن نباتاً، رد بكلمة NOT_A_PLANT. إذا كانت نباتاً، اذكر: 1-المرض، 2-السبب، 3-العلاج. باللهجة الجزائرية وبدون رموز نجمة.";
+                const result = await model.generateContent([prompt, { inlineData: { data: imgBase64, mimeType: "image/jpeg" } }]);
                 const text = result.response.text();
 
                 if (text.includes("NOT_A_PLANT")) {
-                    resultDiv.innerHTML = "❌ عذراً! يرجى تصوير النبات فقط.";
+                    alert("يرجى تصوير نبتة فقط!");
+                    location.reload();
                 } else {
-                    resultDiv.innerHTML = `<b>التحليل:</b><br>${text}`;
+                    parseResults(text);
+                    showPage(3);
                 }
             } catch (e) {
-                resultDiv.innerHTML = `حدث خطأ: ${e.message}`;
+                alert("خطأ في الاتصال: " + e.message);
             } finally {
-                btn.disabled = false; btn.innerText = "حلل الحالة الآن";
-                scanner.style.display = "none";
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerText = "🔍 تحليل الحالة";
             }
         };
 
-        startCam();
+        function parseResults(text) {
+            // محاولة تقسيم النص بشكل بسيط (يعتمد على ذكاء Gemini في الالتزام بالترتيب)
+            const parts = text.split('\n');
+            document.getElementById('res-disease').innerText = parts[0] || "غير محدد";
+            document.getElementById('res-cause').innerText = parts[1] || "غير محدد";
+            document.getElementById('res-treatment').innerText = parts[2] || "اتبع نصائح عامة";
+        }
     </script>
 </body>
 </html>
