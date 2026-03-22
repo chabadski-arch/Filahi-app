@@ -3,92 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>فلاحي الذكي 🌱</title>
+    <title>فلاحي الذكي 🌱 | فكرة صح</title>
     <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; background: #1a0121; color: white; text-align: center; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .app-card { width: 90%; max-width: 400px; background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; border: 1px solid rgba(255,255,255,0.2); }
-        .screen { display: none; } .active { display: block; }
-        video { width: 100%; aspect-ratio: 1; border-radius: 15px; background: #000; object-fit: cover; margin-bottom: 15px; }
-        .btn { background: #28a745; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1.1rem; }
-        #res { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; margin-top: 15px; text-align: right; line-height: 1.6; max-height: 200px; overflow-y: auto; }
+        :root {
+            --primary: #28a745;
+            --accent: #dcbfff;
+            --bg: radial-gradient(circle at top right, #1f0131, #0d3b1e);
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body { 
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: var(--bg); color: white; height: 100vh; 
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+        }
+
+        .app-card {
+            width: 90%; max-width: 400px; height: 85vh;
+            background: var(--glass); backdrop-filter: blur(20px);
+            border-radius: 30px; border: 1px solid rgba(255,255,255,0.2);
+            padding: 25px; display: flex; flex-direction: column; position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center;
+        }
+
+        .page { display: none; flex-direction: column; height: 100%; animation: fadeIn 0.4s ease; }
+        .active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* الصفحة 1: الترحيب */
+        .logo { font-size: 70px; margin-bottom: 10px; }
+        .dev-name { font-size: 0.9rem; color: var(--accent); opacity: 0.9; margin-bottom: 5px; }
+        .app-name { font-size: 2.2rem; margin: 0; font-weight: bold; }
+        .page1-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .footer-rights { font-size: 0.75rem; opacity: 0.6; padding-top: 20px; }
+
+        /* الصفحة 2: الكاميرا */
+        .camera-box { width: 100%; aspect-ratio: 1; border-radius: 20px; background: #000; overflow: hidden; margin-bottom: 15px; border: 1px solid var(--glass); }
+        video, #img-prev { width: 100%; height: 100%; object-fit: cover; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 10px; }
+
+        /* الصفحة 3: النتائج */
+        #res-display { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 20px; text-align: right; line-height: 1.7; overflow-y: auto; flex: 1; margin-bottom: 15px; border: 1px solid var(--primary); }
+
+        /* الأزرار */
+        .btn { 
+            background: var(--primary); border: none; padding: 16px; border-radius: 15px; 
+            color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid white; flex: 1; font-size: 0.9rem; }
+        .btn:active { transform: scale(0.96); }
+        .btn:disabled { background: #555; opacity: 0.7; }
     </style>
 </head>
 <body>
 
     <div class="app-card">
-        <div id="p1" class="screen active">
-            <h1>🌱 فلاحي الذكي</h1>
-            <p>مشروع "فكرة صح" - El Milia</p>
-            <button class="btn" onclick="go(2)">ابدأ الفحص الآن</button>
+        
+        <div id="p1" class="page active">
+            <div class="page1-content">
+                <div class="logo">🌱</div>
+                <div class="dev-name">المطور: شامخ باديس</div>
+                <h1 class="app-name">فلاحي الذكي</h1>
+                <p style="opacity:0.7">مشروع "فكرة صح" - جيجل</p>
+                <button class="btn" style="margin-top:30px" onclick="go(2)">إبدأ الفحص الآن</button>
+            </div>
+            <div class="footer-rights">© 2026 جميع الحقوق محفوظة - فكرة صح</div>
         </div>
 
-        <div id="p2" class="screen">
-            <video id="v" autoplay playsinline></video>
-            <button class="btn" id="run">تحليل الصورة 🔍</button>
+        <div id="p2" class="page">
+            <h3 style="margin-top:0">التقط صورة النبتة</h3>
+            <div class="camera-box">
+                <video id="v" autoplay playsinline></video>
+                <img id="img-prev" style="display:none">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="document.getElementById('file-in').click()">📁 رفع صورة</button>
+                <input type="file" id="file-in" style="display:none" accept="image/*">
+            </div>
+            <button class="btn" id="run-btn" style="background: linear-gradient(45deg, #1e7e34, #28a745);">🔍 تحليل الصورة</button>
         </div>
 
-        <div id="p3" class="screen">
-            <h3>النتيجة النهائية:</h3>
-            <div id="res">جاري الاتصال بالسيرفر...</div>
-            <button class="btn" style="background:#6c757d; margin-top:10px;" onclick="location.reload()">فحص جديد 🔄</button>
+        <div id="p3" class="page">
+            <h3 style="margin-top:0">نتائج التشخيص ✅</h3>
+            <div id="res-display">جاري معالجة البيانات...</div>
+            <button class="btn" onclick="location.reload()">🔄 فحص نبتة أخرى</button>
         </div>
+
     </div>
 
     <script>
-        // المفتاح الجديد الخاص بك
-        const KEY = "AIzaSyC4GEBtdzNq_LQ5-WzFJ_SgdKB-xg8lr-Y";
-
+        const API_KEY = "AIzaSyC4GEBtdzNq_LQ5-WzFJ_SgdKB-xg8lr-Y";
+        
         function go(n) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('p'+n).classList.add('active');
-            if(n===2) startCam();
+            if(n===2) startCamera();
         }
 
-        async function startCam() {
+        const video = document.getElementById('v');
+        const imgPrev = document.getElementById('img-prev');
+        const fileIn = document.getElementById('file-in');
+        const runBtn = document.getElementById('run-btn');
+
+        async function startCamera() {
             try {
-                const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                document.getElementById('v').srcObject = s;
-            } catch(e) { alert("الكاميرا لا تعمل، تأكد من إذن HTTPS"); }
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = stream;
+            } catch(e) { console.log("Camera access denied"); }
         }
 
-        document.getElementById('run').onclick = async () => {
-            const btn = document.getElementById('run');
-            btn.disabled = true; btn.innerText = "جاري المعالجة...";
+        fileIn.onchange = (e) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                video.style.display = 'none';
+                imgPrev.src = ev.target.result;
+                imgPrev.style.display = 'block';
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        };
+
+        runBtn.onclick = async () => {
+            runBtn.disabled = true;
+            runBtn.innerText = "جاري التحليل... 🌱";
             
-            const v = document.getElementById('v');
-            const c = document.createElement('canvas');
-            c.width = v.videoWidth; c.height = v.videoHeight;
-            c.getContext('2d').drawImage(v, 0, 0);
-            const base64 = c.toDataURL('image/jpeg', 0.5).split(',')[1];
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth || imgPrev.naturalWidth;
+            canvas.height = video.videoHeight || imgPrev.naturalHeight;
+            canvas.getContext('2d').drawImage(video.style.display!=='none'?video:imgPrev, 0, 0);
+            const base64 = canvas.toDataURL('image/jpeg', 0.5).split(',')[1];
 
             go(3);
-            const resDiv = document.getElementById('res');
+            const resDiv = document.getElementById('res-display');
 
-            // إرسال الطلب مباشرة عبر API بدون مكتبات
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{
                             parts: [
-                                { text: "أنت خبير زراعي جزائري. حلل صورة النبتة واذكر المرض والعلاج باختصار بالدارجة." },
+                                { text: "أنت خبير زراعي جزائري. حلل صورة النبتة واذكر بدقة: المرض، السبب، والعلاج بالدارجة الجزائرية وبشكل نقاط واضحة وبدون رموز خاصة." },
                                 { inlineData: { mimeType: "image/jpeg", data: base64 } }
                             ]
                         }]
                     })
                 });
 
-                const data = await response.json();
-                if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    resDiv.innerHTML = data.candidates[0].content.parts[0].text;
+                const data = await resp.json();
+                if (data.candidates && data.candidates[0].content) {
+                    resDiv.innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, "<br>");
                 } else {
-                    resDiv.innerText = "لم يتم التعرف على النتيجة، حاول مرة أخرى.";
+                    resDiv.innerText = "تعذر التحليل، يرجى محاولة تصوير الورقة بشكل أوضح.";
                 }
             } catch(e) {
-                resDiv.innerText = "خطأ في الاتصال بالشبكة: " + e.message;
+                resDiv.innerText = "خطأ في الشبكة: " + e.message;
             } finally {
-                btn.disabled = false; btn.innerText = "تحليل الصورة 🔍";
+                runBtn.disabled = false;
+                runBtn.innerText = "🔍 تحليل الصورة";
             }
         };
     </script>
