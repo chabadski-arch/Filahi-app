@@ -3,124 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>فلاحي الذكي 🌱 | مشروع فكرة صح</title>
+    <title>فلاحي الذكي 🌱 | فكرة صح</title>
     <style>
-        :root {
-            --primary: #28a745; /* أخضر فلاحي */
-            --accent: #dcbfff; /* بنفسجي فاتح */
-            --bg: radial-gradient(circle at top right, #1f0131, #0d3b1e);
-            --glass: rgba(255, 255, 255, 0.1);
-        }
-
-        body { 
-            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; 
-            background: var(--bg); color: white; height: 100vh; 
-            display: flex; justify-content: center; align-items: center; overflow: hidden;
-        }
-
-        .app-card {
-            width: 90%; max-width: 420px; height: 85vh;
-            background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-radius: 30px; border: 1px solid rgba(255,255,255,0.2);
-            padding: 25px; display: flex; flex-direction: column; position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center;
-        }
-
+        :root { --primary: #28a745; --accent: #dcbfff; --bg: radial-gradient(circle at top right, #1f0131, #0d3b1e); --glass: rgba(255, 255, 255, 0.1); }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: white; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .app-card { width: 90%; max-width: 400px; height: 85vh; background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 30px; border: 1px solid rgba(255,255,255,0.2); padding: 25px; display: flex; flex-direction: column; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; }
         .page { display: none; flex-direction: column; height: 100%; animation: fadeIn 0.4s ease; }
         .active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* الصفحة 1: الترحيب */
         .page1-content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .logo { font-size: 80px; margin-bottom: 20px; text-shadow: 0 0 20px rgba(220,191,255,0.4); }
-        .dev-name { font-size: 0.95rem; color: var(--accent); opacity: 0.9; margin-bottom: 5px; }
-        .app-name { font-size: 2.3rem; margin: 0; font-weight: bold; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-        .page1-desc { font-size: 1rem; opacity: 0.7; margin: 15px 0 35px; }
+        .logo { font-size: 80px; margin-bottom: 20px; }
+        .dev-name { font-size: 0.9rem; color: var(--accent); opacity: 0.9; margin-bottom: 5px; }
+        .app-name { font-size: 2.2rem; margin: 0; font-weight: bold; }
         .footer-rights { font-size: 0.75rem; opacity: 0.6; padding-top: 20px; }
-
-        /* الصفحة 2: الكاميرا */
-        .camera-box { width: 100%; aspect-ratio: 1; border-radius: 20px; background: #000; overflow: hidden; margin-bottom: 15px; border: 1px solid var(--glass); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .camera-box { width: 100%; aspect-ratio: 1; border-radius: 20px; background: #000; overflow: hidden; margin-bottom: 15px; border: 1px solid var(--glass); }
         video, #img-prev { width: 100%; height: 100%; object-fit: cover; }
         .hidden-file { display: none; }
-        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid white; flex: 1; font-size: 0.95rem; color: white; border-radius: 12px; }
-
-        /* الصفحة 3: النتائج */
-        #res-display { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 20px; text-align: right; line-height: 1.7; overflow-y: auto; flex: 1; margin-bottom: 20px; border: 1px solid var(--primary); font-size: 0.95rem; }
-
-        /* الأزرار الأساسية */
-        .btn { 
-            background: linear-gradient(45deg, #1e7e34, #28a745, #32cd32);
-            background-size: 200% 200%; border: none; padding: 18px; border-radius: 20px; 
-            color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(34,139,34,0.3); animation: gradientBG 4s ease infinite;
-        }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .btn:active { transform: scale(0.96); opacity: 0.9; }
-        .btn:disabled { background: #555; opacity: 0.7; cursor: wait; animation: none; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 10px; }
+        .btn { background: var(--primary); border: none; padding: 16px; border-radius: 15px; color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid white; flex: 1; font-size: 0.9rem; }
+        .btn:active { transform: scale(0.96); }
+        .btn:disabled { background: #555; opacity: 0.7; }
+        #res-display { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 20px; text-align: right; line-height: 1.7; overflow-y: auto; flex: 1; margin-bottom: 15px; border: 1px solid var(--primary); }
     </style>
 </head>
 <body>
-
     <div class="app-card">
-        
         <div id="p1" class="page active">
             <div class="page1-content">
                 <div class="logo">🌱</div>
                 <div class="dev-name">المطور: شامخ باديس</div>
                 <h1 class="app-name">فلاحي الذكي</h1>
-                <p class="page1-desc">مشروع "فكرة صح"<br>جيجل - الجزائر</p>
-                <button class="btn" onclick="go(2)">ابدأ الفحص الآن</button>
+                <p style="opacity:0.7">مشروع "فكرة صح" - جيجل</p>
+                <button class="btn" style="margin-top:30px" onclick="go(2)">ابدأ الفحص الآن</button>
             </div>
             <div class="footer-rights">© 2026 جميع الحقوق محفوظة - فكرة صح</div>
         </div>
-
         <div id="p2" class="page">
-            <h3 style="margin: 0 0 15px 0; font-size: 1.3rem;">التقط صورة النبتة</h3>
+            <h3 style="margin-top:0">التقط صورة النبتة</h3>
             <div class="camera-box">
                 <video id="v" autoplay playsinline></video>
                 <img id="img-prev" style="display:none">
             </div>
             <div class="btn-group">
-                <button class="btn btn-secondary" onclick="document.getElementById('file-in').click()">📁 رفع صورة من الهاتف</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('file-in').click()">📁 رفع صورة</button>
                 <input type="file" id="file-in" class="hidden-file" accept="image/*">
             </div>
             <button class="btn" id="run-btn">🔍 تحليل الصورة</button>
         </div>
-
         <div id="p3" class="page">
-            <h3 style="margin: 0 0 15px 0; font-size: 1.3rem;">نتائج التشخيص ✅</h3>
+            <h3 style="margin-top:0">نتائج التشخيص ✅</h3>
             <div id="res-display">جاري التواصل مع الذكاء الاصطناعي... 🌱⏳</div>
             <button class="btn" onclick="location.reload()">🔄 فحص نبتة أخرى</button>
         </div>
-
     </div>
-
     <script>
         const API_KEY = "AIzaSyC4GEBtdzNq_LQ5-WzFJ_SgdKB-xg8lr-Y";
-        
         function go(n) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('p'+n).classList.add('active');
             if(n===2) startCamera();
         }
-
         const video = document.getElementById('v');
         const imgPrev = document.getElementById('img-prev');
         const fileIn = document.getElementById('file-in');
         const runBtn = document.getElementById('run-btn');
         const resDiv = document.getElementById('res-display');
-
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                 video.srcObject = stream;
-            } catch(e) { 
-                resDiv.style.display = 'block';
-                resDiv.innerHTML = "<span style='color:#ff8a8a'>❌ يرجى تفعيل الكاميرا وتأكد من رابط HTTPS.</span>"; 
-            }
+            } catch(e) { alert("يرجى تفعيل الكاميرا"); }
         }
-
         fileIn.onchange = (e) => {
             const reader = new FileReader();
             reader.onload = (ev) => {
@@ -130,23 +84,18 @@
             };
             reader.readAsDataURL(e.target.files[0]);
         };
-
         runBtn.onclick = async () => {
             runBtn.disabled = true;
-            runBtn.innerText = "جاري التحليل الذكي... 🌱";
-            
+            runBtn.innerText = "جاري التحليل... 🌱";
             const canvas = document.createElement('canvas');
             const source = video.style.display!=='none'?video:imgPrev;
             canvas.width = source.videoWidth || source.naturalWidth;
             canvas.height = source.videoHeight || source.naturalHeight;
             canvas.getContext('2d').drawImage(source, 0, 0);
             const base64 = canvas.toDataURL('image/jpeg', 0.5).split(',')[1];
-
             go(3);
             resDiv.innerHTML = "جاري استخراج التشخيص... ⏳🌱";
-
             try {
-                // طلب مباشر لـ v1 Stable API لتجنب أخطاء v1beta القديمة
                 const resp = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -159,15 +108,21 @@
                         }]
                     })
                 });
-
                 const data = await resp.json();
                 
-                // تعديل طريقة قراءة النص لضمان ظهور الرد فوراً
-                if (data.candidates && data.candidates[0].content) {
-                    resDiv.innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, "<br>");
+                // --- التعديل الجذري والقوي هنا ---
+                let finalResponse = "لم يتم التعرف على الرد، جرب مرة أخرى.";
+                
+                // التحقق بعمق من وجود النص في الرد مهما تغير شكله
+                if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+                    finalResponse = data.candidates[0].content.parts[0].text;
+                } else if (data && data.error) {
+                    finalResponse = `خطأ من السيرفر: ${data.error.message}`;
                 } else {
-                    resDiv.innerText = "تعذر التشخيص، يرجى المحاولة مرة أخرى بصورة أوضح للورقة المريضة.";
+                    finalResponse = "جوجل لم تعطي رداً واضحاً. جرب تصوير النبتة عن قرب وبإضاءة جيدة.";
                 }
+                
+                resDiv.innerHTML = finalResponse.replace(/\n/g, "<br>");
             } catch(e) {
                 resDiv.innerText = "خطأ في الشبكة: " + e.message;
             } finally {
