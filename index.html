@@ -16,8 +16,8 @@
     <style>
         :root {
             --primary-bg: radial-gradient(circle at top right, #3e0a3e, #1f0131, #0d3b1e);
-            --glass: rgba(255, 255, 255, 0.08);
-            --border: rgba(255, 255, 255, 0.15);
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.2);
             --accent: #a5ffa5;
         }
 
@@ -30,64 +30,47 @@
         }
 
         .app-card {
-            width: 90%; max-width: 420px;
+            width: 90%; max-width: 400px;
             background: var(--glass);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-radius: 30px; border: 1px solid var(--border);
-            padding: 25px; box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-            display: flex; flex-direction: column; gap: 20px;
-            transition: 0.3s;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 25px; border: 1px solid var(--border);
+            padding: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; gap: 15px;
         }
 
-        header { text-align: center; }
-        header h1 { font-size: 1.7rem; margin: 0; color: #dcbfff; text-shadow: 0 0 15px rgba(220,191,255,0.4); }
-        header p { font-size: 0.85rem; opacity: 0.8; margin-top: 6px; }
+        header h1 { font-size: 1.5rem; margin: 0; color: #dcbfff; text-align: center; }
+        header p { font-size: 0.8rem; opacity: 0.7; text-align: center; margin: 5px 0 0; }
 
         .cam-box {
             position: relative; width: 100%; aspect-ratio: 1;
-            border-radius: 20px; overflow: hidden;
+            border-radius: 15px; overflow: hidden;
             background: #000; border: 1px solid var(--border);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
 
         video { width: 100%; height: 100%; object-fit: cover; }
 
         .scan-line {
-            position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-            background: linear-gradient(to bottom, transparent, var(--accent), transparent);
-            box-shadow: 0 0 20px var(--accent);
-            animation: scan 2.5s ease-in-out infinite; display: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--accent); box-shadow: 0 0 10px var(--accent);
+            animation: scan 2s linear infinite; display: none;
         }
 
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
         .btn-main {
-            background: linear-gradient(45deg, #1a5c1a, #228b22, #32cd32);
-            background-size: 200% 200%;
-            border: none; padding: 18px; border-radius: 20px;
-            color: white; font-size: 1.15rem; font-weight: bold;
-            cursor: pointer; transition: 0.4s;
-            box-shadow: 0 8px 20px rgba(34,139,34,0.3);
-            animation: gradientBG 4s ease infinite;
+            background: #228b22; border: none; padding: 15px;
+            border-radius: 15px; color: white; font-size: 1.1rem;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
         }
 
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        .btn-main:active { transform: scale(0.96); opacity: 0.9; }
-        .btn-main:disabled { background: #555; box-shadow: none; cursor: wait; animation: none; }
+        .btn-main:disabled { background: #555; cursor: not-allowed; }
 
         #result {
-            background: rgba(0,0,0,0.5); border-radius: 18px;
-            padding: 18px; font-size: 0.98rem; line-height: 1.7;
-            display: none; max-height: 200px; overflow-y: auto;
-            border: 1px solid rgba(255,255,255,0.08); text-align: right;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.4); border-radius: 15px;
+            padding: 15px; font-size: 0.9rem; line-height: 1.5;
+            display: none; max-height: 150px; overflow-y: auto;
+            text-align: right; border: 1px solid rgba(255,255,255,0.1);
         }
-
-        .error { color: #ff9a9a; font-weight: bold; }
-        .success { color: #b5ffb5; }
-        .loading { color: #dcbfff; font-style: italic; }
-
     </style>
 </head>
 <body>
@@ -95,7 +78,7 @@
     <div class="app-card">
         <header>
             <h1>فلاحي الذكي 🌱</h1>
-            <p>حلل حالة شجرتك في ثوانٍ</p>
+            <p>مشروع "فكرة صح" - El Milia</p>
         </header>
         
         <div class="cam-box">
@@ -103,7 +86,7 @@
             <div id="scanner" class="scan-line"></div>
         </div>
 
-        <button id="analyzeBtn" class="btn-main">بدء التحليل الذكي</button>
+        <button id="analyzeBtn" class="btn-main">حلل الحالة الآن</button>
         
         <div id="result"></div>
     </div>
@@ -111,13 +94,11 @@
     <script type="module">
         import { GoogleGenerativeAI } from "@google/generative-ai";
 
-        // --- المفتاح المشفر (Base64) ---
-        // لا يمكن قراءته بالعين المجردة، مما يوفر حماية أساسية.
-        const encodedKey = "QUl6YVN5Q3NqRDBxNlJhT2dFZTlqVk1MQ2l3UGJQVWI5SVpiWlY0";
-
-        // فك تشفير المفتاح وقت الاستخدام
-        const API_KEY = atob(encodedKey);
+        // المفتاح الجديد المباشر
+        const API_KEY = "AIzaSyC4GEBtdzNq_LQ5-WzFJ_SgdKB-xg8lr-Y"; 
+        
         const genAI = new GoogleGenerativeAI(API_KEY);
+        // نستخدم نسخة Flash لأنها الأسرع والأفضل للمشاريع المجانية
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const video = document.getElementById('video');
@@ -125,56 +106,46 @@
         const resultDiv = document.getElementById('result');
         const scanner = document.getElementById('scanner');
 
-        // تشغيل الكاميرا
         async function startCam() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "environment" } 
-                });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                 video.srcObject = stream;
             } catch (err) {
                 resultDiv.style.display = "block";
-                resultDiv.innerHTML = "<span class='error'>يرجى السماح بالوصول للكاميرا. يجب أن يكون الرابط HTTPS لكي تعمل الكاميرا.</span>";
+                resultDiv.innerHTML = "يرجى تفعيل الكاميرا وتأكد من رابط HTTPS.";
             }
         }
 
-        // التقاط الصورة
         function getFrame() {
             const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
-            return canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
+            return canvas.toDataURL('image/jpeg', 0.5).split(',')[1];
         }
 
         btn.onclick = async () => {
-            btn.disabled = true;
-            btn.innerText = "جاري الاتصال بـ Gemini... ⏳";
-            scanner.style.display = "block";
-            resultDiv.style.display = "block";
-            resultDiv.innerHTML = "<span class='loading'>يتم الآن مراجعة الصورة... انتظر قليلاً.</span>";
+            btn.disabled = true; btn.innerText = "جاري التحليل... ⏳";
+            scanner.style.display = "block"; resultDiv.style.display = "block";
+            resultDiv.innerHTML = "جاري مراجعة الصورة...";
 
             try {
                 const imageData = getFrame();
-                const prompt = "أنت خبير فلاحي. حلل الصورة. إذا لم تكن لنبات رد بـ NOT_A_PLANT. إذا كانت نباتاً، شخص الحالة وأعطِ العلاج باللهجة الجزائرية باختصار شديد وبشكل نقاط.";
+                const prompt = "أنت خبير فلاحي جزائري. حلل النبتة في الصورة. إذا لم تكن نباتاً، رد بـ NOT_A_PLANT. إذا كانت نباتاً، شخص الحالة وأعطِ الحل باختصار.";
                 
                 const result = await model.generateContent([
-                    prompt,
-                    { inlineData: { data: imageData, mimeType: "image/jpeg" } }
+                    prompt, { inlineData: { data: imageData, mimeType: "image/jpeg" } }
                 ]);
 
                 const text = result.response.text();
-
                 if (text.includes("NOT_A_PLANT")) {
-                    resultDiv.innerHTML = "<span class='error'>❌ عذراً! يرجى تصوير النبات فقط. هذا التطبيق مخصص للفلاحة.</span>";
+                    resultDiv.innerHTML = "❌ هذا ليس نباتاً! يرجى تصوير الشجرة فقط.";
                 } else {
-                    resultDiv.innerHTML = `<span class='success'><b>✅ التحليل:</b><br>${text}</span>`;
+                    resultDiv.innerHTML = `<b>✅ التحليل:</b><br>${text}`;
                 }
             } catch (e) {
-                resultDiv.innerHTML = "<span class='error'>حدث خطأ في الاتصال. تأكد من الإنترنت أو صلاحية المفتاح.</span>";
+                resultDiv.innerHTML = `حدث خطأ: ${e.message}`;
             } finally {
-                btn.disabled = false;
-                btn.innerText = "بدء التحليل الذكي";
+                btn.disabled = false; btn.innerText = "حلل الحالة الآن";
                 scanner.style.display = "none";
             }
         };
