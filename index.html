@@ -16,8 +16,8 @@
     <style>
         :root {
             --primary-bg: radial-gradient(circle at top right, #3e0a3e, #1f0131, #0d3b1e);
-            --glass: rgba(255, 255, 255, 0.1);
-            --border: rgba(255, 255, 255, 0.2);
+            --glass: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.15);
             --accent: #a5ffa5;
         }
 
@@ -30,45 +30,47 @@
         }
 
         .app-card {
-            width: 90%; max-width: 400px;
+            width: 90%; max-width: 420px;
             background: var(--glass);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 25px; border: 1px solid var(--border);
-            padding: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-            display: flex; flex-direction: column; gap: 15px;
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-radius: 30px; border: 1px solid var(--border);
+            padding: 25px; box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            display: flex; flex-direction: column; gap: 20px;
         }
 
-        header h1 { font-size: 1.5rem; margin: 0; color: #dcbfff; text-align: center; }
-        header p { font-size: 0.8rem; opacity: 0.7; text-align: center; margin: 5px 0 0; }
+        header h1 { font-size: 1.6rem; margin: 0; color: #dcbfff; text-align: center; }
+        header p { font-size: 0.85rem; opacity: 0.8; text-align: center; margin: 5px 0 0; }
 
         .cam-box {
             position: relative; width: 100%; aspect-ratio: 1;
-            border-radius: 15px; overflow: hidden;
+            border-radius: 20px; overflow: hidden;
             background: #000; border: 1px solid var(--border);
         }
 
         video { width: 100%; height: 100%; object-fit: cover; }
 
         .scan-line {
-            position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: var(--accent); box-shadow: 0 0 10px var(--accent);
-            animation: scan 2s linear infinite; display: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: var(--accent); box-shadow: 0 0 15px var(--accent);
+            animation: scan 2.5s ease-in-out infinite; display: none;
         }
 
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
         .btn-main {
-            background: #228b22; border: none; padding: 15px;
-            border-radius: 15px; color: white; font-size: 1.1rem;
-            font-weight: bold; cursor: pointer; transition: 0.3s;
+            background: linear-gradient(45deg, #228b22, #32cd32);
+            border: none; padding: 16px; border-radius: 18px;
+            color: white; font-size: 1.1rem; font-weight: bold;
+            cursor: pointer; transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(34,139,34,0.3);
         }
 
-        .btn-main:disabled { background: #555; cursor: not-allowed; }
+        .btn-main:disabled { background: #555; cursor: wait; }
 
         #result {
-            background: rgba(0,0,0,0.4); border-radius: 15px;
-            padding: 15px; font-size: 0.9rem; line-height: 1.5;
-            display: none; max-height: 150px; overflow-y: auto;
+            background: rgba(0,0,0,0.5); border-radius: 18px;
+            padding: 15px; font-size: 0.95rem; line-height: 1.6;
+            display: none; max-height: 180px; overflow-y: auto;
             text-align: right; border: 1px solid rgba(255,255,255,0.1);
         }
     </style>
@@ -94,12 +96,12 @@
     <script type="module">
         import { GoogleGenerativeAI } from "@google/generative-ai";
 
-        // المفتاح الجديد المباشر
-        const API_KEY = "AIzaSyC4GEBtdzNq_LQ5-WzFJ_SgdKB-xg8lr-Y"; 
-        
+        // نستخدم نفس مفتاحك القديم، التغيير سيكون في اسم النموذج
+        const API_KEY = "AIzaSyCsjD0q6RaOgEe9jVMLCiwPrPUb9IZbZV4"; 
         const genAI = new GoogleGenerativeAI(API_KEY);
-        // نستخدم نسخة Flash لأنها الأسرع والأفضل للمشاريع المجانية
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        
+        // التعديل الجذري هنا: نستخدم النموذج المستقر gemini-pro-vision المخصص للصور
+        const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
 
         const video = document.getElementById('video');
         const btn = document.getElementById('analyzeBtn');
@@ -108,11 +110,13 @@
 
         async function startCam() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment" } 
+                });
                 video.srcObject = stream;
             } catch (err) {
                 resultDiv.style.display = "block";
-                resultDiv.innerHTML = "يرجى تفعيل الكاميرا وتأكد من رابط HTTPS.";
+                resultDiv.innerHTML = "يرجى تفعيل الكاميرا (يجب أن يكون الرابط HTTPS).";
             }
         }
 
@@ -120,27 +124,31 @@
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth; canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
-            return canvas.toDataURL('image/jpeg', 0.5).split(',')[1];
+            // نحول الصورة إلى Base64، نموذج gemini-pro-vision يحتاجها بهذه الصيغة
+            return canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
         }
 
         btn.onclick = async () => {
             btn.disabled = true; btn.innerText = "جاري التحليل... ⏳";
             scanner.style.display = "block"; resultDiv.style.display = "block";
-            resultDiv.innerHTML = "جاري مراجعة الصورة...";
+            resultDiv.innerHTML = "يتم الآن التواصل مع الذكاء الاصطناعي (Stable API)...";
 
             try {
                 const imageData = getFrame();
-                const prompt = "أنت خبير فلاحي جزائري. حلل النبتة في الصورة. إذا لم تكن نباتاً، رد بـ NOT_A_PLANT. إذا كانت نباتاً، شخص الحالة وأعطِ الحل باختصار.";
+                const prompt = "أنت خبير فلاحي جزائري. حلل النبتة في الصورة. إذا لم تكن نباتاً، رد بـ NOT_A_PLANT. إذا كانت نباتاً، شخص الحالة وأعطِ العلاج باللهجة الجزائرية باختصار.";
                 
+                // تغيير طريقة الإرسال لتتوافق مع نموذج gemini-pro-vision
                 const result = await model.generateContent([
-                    prompt, { inlineData: { data: imageData, mimeType: "image/jpeg" } }
+                    prompt,
+                    { inlineData: { data: imageData, mimeType: "image/jpeg" } }
                 ]);
 
                 const text = result.response.text();
+
                 if (text.includes("NOT_A_PLANT")) {
-                    resultDiv.innerHTML = "❌ هذا ليس نباتاً! يرجى تصوير الشجرة فقط.";
+                    resultDiv.innerHTML = "❌ عذراً! يرجى تصوير النبات فقط.";
                 } else {
-                    resultDiv.innerHTML = `<b>✅ التحليل:</b><br>${text}`;
+                    resultDiv.innerHTML = `<b>التحليل:</b><br>${text}`;
                 }
             } catch (e) {
                 resultDiv.innerHTML = `حدث خطأ: ${e.message}`;
